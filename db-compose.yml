@@ -1,0 +1,14 @@
+services:
+  database:
+    image: 'postgres:16'
+    ports:
+      - '5430:5432'
+    environment:
+      - 'POSTGRES_USER=myuser'
+      - 'POSTGRES_DB=mydatabase'
+      - 'POSTGRES_PASSWORD=secret'
+    volumes:
+      - 'taskmaster-dev-db:/var/lib/postgresql/data'
+
+volumes:
+  taskmaster-dev-db:
