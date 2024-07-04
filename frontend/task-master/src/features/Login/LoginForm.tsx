@@ -3,7 +3,7 @@ import { UseControllerProps, useForm } from "react-hook-form";
 import { CreateAccountRequest, LoginRequest } from "@/service/types.ts";
 import { authenticate, getUserData } from "@/service/userService.ts";
 import { useLoggedInUser, User } from "@/store/userStore.ts";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/Button";
 import Typography from "@/components/Typography";
 import { Simulate } from "react-dom/test-utils";
@@ -27,21 +27,23 @@ const LoginForm = () => {
     __tag: "IDLE",
   });
 
-  const setUser = useLoggedInUser((s) => s.setUser);
+  const { token, setToken, setUser } = useLoggedInUser((s) => s);
   const navigate = useNavigate();
 
   const onValidForm = (data: LoginRequest) => {
     setState({ __tag: "LOADING" });
     authenticate(data)
-      .then(() => {
-        getUserData().then((data: User) => {
-          setUser(data);
-          setState({ __tag: "COMPLETED" });
-          navigate("/home/your-work");
-        });
+      .then((t) => {
+        localStorage.setItem("jwt", t);
+        setToken(t);
       })
       .catch((e) => setState({ __tag: "FAILED", error: e }));
   };
+
+  useEffect(() => {
+    if (!token) return;
+    navigate("/home");
+  }, [token]);
 
   return (
     <form onSubmit={handleSubmit(onValidForm, console.log)}>

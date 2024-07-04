@@ -13,16 +13,16 @@ export const createUser = (signUpInfo: CreateAccountRequest) => {
 };
 
 export const verifyLogin = () => {
-  return http.get<{ loggedIn: boolean }>("/v1/auth/validate").then(getData);
+  return http.get<string>("/v1/auth/validate").then(getData);
+};
+
+export const refreshToken = () => {
+  return http.get<string>("/v1/auth/refresh-token").then(getData);
 };
 
 export const authenticate = (loginCreds: LoginRequest) => {
-  return axios
-    .post<string>(
-      import.meta.env.VITE_BACKEND_BASE_PATH + "/v1/auth/token",
-      loginCreds,
-    )
-    .then(getData);
+  const url = import.meta.env.VITE_BACKEND_BASE_PATH + "/v1/auth/token";
+  return axios.post<string>(url, loginCreds).then(getData);
 };
 
 export const getUserData = () => {

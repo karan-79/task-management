@@ -23,7 +23,8 @@ import java.util.List;
 @EnableWebSecurity
 public class WebSecurityConfig {
 
-    @Autowired JwtUtils jwtUtils;
+    @Autowired
+    JwtUtils jwtUtils;
 
     private static List<String> ALLOWED_METHODS = List.of(
             "GET",
@@ -34,28 +35,33 @@ public class WebSecurityConfig {
             "OPTIONS"
     );
 
+    private static List<String> ALLOWED_HEADERS = List.of(
+            "Content-Type",
+            "Authorization"
+    );
+
     private static List<String> ALLOWED_ORIGINS = List.of(
-            "http://localhost:5173"
+            "https://localhost:5173"
     );
 
     @Bean
     @Order(-1)
     CorsConfigurationSource corsConfigurationSource() {
-       CorsConfiguration configuration = new CorsConfiguration();
+        CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(ALLOWED_ORIGINS);
         configuration.setAllowedMethods(ALLOWED_METHODS);
-        configuration.addAllowedHeader("Content-Type");
+        configuration.addAllowedHeader("*");
         configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
 
-        CorsConfiguration configWithoutCredentials = new CorsConfiguration();
-        configWithoutCredentials.setAllowedOrigins(ALLOWED_ORIGINS);
-        configWithoutCredentials.setAllowedMethods(ALLOWED_METHODS);
-        configWithoutCredentials.addAllowedHeader("Content-Type");
-        configWithoutCredentials.setAllowCredentials(false);
-        source.registerCorsConfiguration("/users/create", configWithoutCredentials);
-        source.registerCorsConfiguration("/auth/token", configWithoutCredentials);
+//        CorsConfiguration configWithoutCredentials = new CorsConfiguration();
+//        configWithoutCredentials.setAllowedOrigins(ALLOWED_ORIGINS);
+//        configWithoutCredentials.setAllowedMethods(ALLOWED_METHODS);
+//        configWithoutCredentials.setAllowedHeaders(ALLOWED_HEADERS);
+//        configWithoutCredentials.setAllowCredentials(false);
+//        source.registerCorsConfiguration("/users/create", configWithoutCredentials);
+//        source.registerCorsConfiguration("/auth/token", configWithoutCredentials);
 
         return source;
     }
@@ -65,7 +71,7 @@ public class WebSecurityConfig {
         return http
                 .addFilterBefore(new JwtFilter(jwtUtils), UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("*/users/create", "/v1/auth/token", "/error")
+                        .requestMatchers("*/users/create", "/v1/auth/token", "/error", "/v1/auth/refresh-token")
                         .permitAll()
                         .anyRequest().authenticated())
                 .anonymous(AbstractHttpConfigurer::disable)
@@ -73,7 +79,7 @@ public class WebSecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
-                .sessionManagement(h->h.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(h -> h.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
     }
 

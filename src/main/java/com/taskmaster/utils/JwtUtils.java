@@ -46,15 +46,20 @@ public class JwtUtils {
 
     public String generateToken(UUID userId) {
         Map<String, Object> claims = new HashMap<>(); //no claims for now
-        return createToken(claims, userId.toString());
+        return createToken(claims, userId.toString(), 1209600000); // 2w for now keeping the AT live enough
     }
 
-    private String createToken(Map<String, Object> claims, String subject) {
+    public String generateRefreshToken(UUID userId) {
+        Map<String, Object> claims = new HashMap<>(); //no claims for now
+        return createToken(claims, userId.toString(), 1209600000); // 2w
+    }
+
+    private String createToken(Map<String, Object> claims, String subject, long expiration) {
         return Jwts.builder()
                 .claims(claims)
                 .subject(subject)
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
+                .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSignInKey())
                 .compact();
     }

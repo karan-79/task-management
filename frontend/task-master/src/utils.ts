@@ -7,3 +7,5 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export const getData = <T>(response: AxiosResponse<T>) => response.data;
+
+export const Identity = <T>(obj: T) => obj;

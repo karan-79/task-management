@@ -47,6 +47,7 @@ public class UsersDAO {
     public User getUserById(UUID userId) {
         var sql = "SELECT Username, Name, Role from USERS where guid = :guid";
         return jdbcTemplate.query(sql, Map.of("guid", userId), rs -> {
+            if(!rs.next()) return null;
             return new User(null,
                     userId,
                     rs.getString("Username"),

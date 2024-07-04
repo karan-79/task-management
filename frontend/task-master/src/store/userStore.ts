@@ -9,10 +9,13 @@ export type User = {
 
 type LoggedInUserState = {
   user: User | null;
+  token: string | null;
   setUser: (user: User | null) => void;
 };
 
 export const useLoggedInUser = create<LoggedInUserState>((set) => ({
   user: null,
+  token: null,
   setUser: (user: User | null) => set((state) => ({ ...state, user })),
+  setToken: (token: string | null) => set((state) => ({ ...state, token })),
 }));

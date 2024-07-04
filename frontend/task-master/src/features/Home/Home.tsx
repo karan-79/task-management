@@ -4,16 +4,27 @@ import ProjectCard from "@/features/Home/ProjectCard.tsx";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/Button";
 import CreateProject from "@/features/Home/CreateProject";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useLoggedInUser } from "@/store/userStore.ts";
+import { Identity } from "@/utils.ts";
+import { getUserData } from "@/service/userService.ts";
 
 const Home = () => {
   const navigate = useNavigate();
 
   const [open, setOpen] = useState(false);
 
+  const { user, setUser } = useLoggedInUser(Identity);
+
   const handleCardClick = (id: string) => () => {
     navigate("/projects/" + id);
   };
+
+  useEffect(() => {
+    getUserData().then((data) => setUser(data));
+  }, []);
+
+  if (!user) return <p>Loading....</p>;
 
   return (
     <>

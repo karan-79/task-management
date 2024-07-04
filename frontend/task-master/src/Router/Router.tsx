@@ -1,4 +1,4 @@
-import { lazy, useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import {
   BrowserRouter,
   Navigate as Redirect,
@@ -38,25 +38,22 @@ const childRoutes = [
 
 // TODO redo the redirect using HOC encapsulating each route
 const Router = () => {
+  const user = useLoggedInUser((state) => state.user);
   return (
-    <BrowserRouter>
+    <>
       <Routes>
         <Route path="/signup" element={<SignUp />} />
         <Route path="/login" element={<Login />} />
         <Route path="*" element={<Navigate />} />
-        <Route path="/home" element={WithLoggedInUser(<Layout />)}>
-          <Route index path="" element={WithLoggedInUser(<YourWork />)} />
+        <Route path="/home" element={<Layout />}>
+          <Route index path="" element={<YourWork />} />
           {childRoutes.map((r) => {
-            return (
-              <Route
-                path={"/home" + r.path}
-                element={WithLoggedInUser(r.component)}
-              />
-            );
+            return <Route path={"/home" + r.path} element={r.component} />;
           })}
         </Route>
       </Routes>
-    </BrowserRouter>
+      {user === null && <Redirect to="/login" />}
+    </>
   );
 };
 
