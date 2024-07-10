@@ -2,13 +2,15 @@ package com.taskmaster.service;
 
 import com.taskmaster.api.web.v1.model.APICreateUserRequest;
 import com.taskmaster.api.web.v1.model.APIUser;
+import com.taskmaster.api.web.v1.model.Person;
 import com.taskmaster.domain.UsersDAO;
 import com.taskmaster.domain.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
+import java.time.Period;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -36,9 +38,18 @@ public class UsersService {
 
     public APIUser getUser(UUID userId) {
         var user = usersDAO.getUserById(userId);
+        if(user == null) return null;
         return new APIUser(user.guid(), user.name(), user.username(), user.role());
     }
 
+    public List<Person> getPersons(Set<UUID> userIds) {
+        if(userIds.isEmpty()) return new ArrayList<>();
+        return usersDAO.getUsers(userIds).stream().map(u -> new Person(u.guid(), u.name(), u.email(), null)).toList();
+    }
 
 
+    //TODO maybe change this to List<Person> ???
+    public List<APIUser> searchUser(String searchQuery) {
+        return usersDAO.findUser(searchQuery).stream().filter(Objects::nonNull).map(user -> new APIUser(user.guid(), user.name(), user.username(), user.role())).toList();
+    }
 }

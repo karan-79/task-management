@@ -1,74 +1,13 @@
-import { Label } from "@/components/Label";
 import { RHFormField } from "@/components/Input";
 import { Button } from "@/components/Button";
-import { CreateAccountRequest, LoggedIn } from "@/service/types.ts";
+import { CreateAccountRequest } from "@/service/types.ts";
 import { UseControllerProps, useForm } from "react-hook-form";
-import { ChangeEvent, useState } from "react";
-import { TextField } from "@/components/TextField";
 import { authenticate, createUser } from "@/service/userService.ts";
 import { useNavigate } from "react-router-dom";
+import { useLoggedInUser } from "@/store/userStore.ts";
+import { Identity } from "@/utils.ts";
 
 const SignUpForm = () => {
-  const [form, setForm] = useState<CreateAccountRequest>({
-    name: "",
-    username: "",
-    email: "",
-    password: "",
-  });
-
-  const handleFieldChange =
-    (field: keyof CreateAccountRequest) =>
-    (e: ChangeEvent<HTMLInputElement>) => {
-      setForm((prev) => ({ ...prev, [field]: e.target.name }));
-    };
-
-  return (
-    <>
-      <div className="grid gap-4">
-        <div className="grid gap-2">
-          <TextField
-            label="Username"
-            name="username"
-            placeholder="Enter a username"
-            onChange={handleFieldChange("username")}
-          />
-        </div>
-        <div className="grid gap-2">
-          <TextField
-            label="Password"
-            name="password"
-            type="password"
-            placeholder="Enter password atleast 8 character long"
-            onChange={handleFieldChange("password")}
-          />
-        </div>
-        <div className="grid gap-2">
-          <TextField
-            label="Name"
-            id="name"
-            type="text"
-            placeholder="Your name"
-            onChange={handleFieldChange("name")}
-          />
-        </div>
-        <div className="grid gap-2">
-          <TextField
-            label="Email"
-            type="email"
-            placeholder="test@cool.com"
-            onChange={handleFieldChange("email")}
-          />
-        </div>
-        <Button type="submit" className="w-full">
-          Login
-        </Button>
-      </div>
-    </>
-  );
-};
-
-//TODO keeping it for now
-const S = () => {
   const { handleSubmit, control, formState } = useForm<CreateAccountRequest>({
     defaultValues: {
       name: "",
@@ -78,14 +17,12 @@ const S = () => {
     },
   });
 
-  const navigate = useNavigate();
-
+  const { setToken } = useLoggedInUser(Identity);
   const onValidForm = (data: CreateAccountRequest) => {
     createUser(data).then(() =>
       authenticate({ username: data.username, password: data.password }).then(
-        (data: LoggedIn) => {
-          if (data.loggedIn) navigate("/home/your-work");
-          if (!data.loggedIn) navigate("/login"); // TODO add a message state to be passed in case of failure
+        (token: string) => {
+          setToken(token);
         },
       ),
     );
@@ -190,4 +127,4 @@ const S = () => {
     </form>
   );
 };
-export default S;
+export default SignUpForm;

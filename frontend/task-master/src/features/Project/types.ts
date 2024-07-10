@@ -1,34 +1,53 @@
-export type Project = {
-    id: string
-    name: string
-    description: string
-    totalIssues?: number
-    totalBoards?: number
-    // TODO can maybe add links
-}
+import { Nullable, UUID } from "@/types/generalTypes.ts";
 
-export type PanelSections = "Board" | "Issues"
+export type Project = {
+  id: string;
+  name: string;
+  description: string;
+  shortName: string;
+  type: string;
+  totalIssues?: number;
+  totalBoards?: number;
+  // TODO can maybe add links
+};
+
+export type PanelSections = "Board" | "Issues";
 
 export type Column = {
-    name: string
-    sortIndex: number
-}
+  id: number;
+  name: string;
+  sortIndex: number;
+};
+
+export type Person = {
+  id: UUID;
+  name: string;
+  imageUrl?: string;
+};
+
+export type TaskType = "TASK" | "BUG" | "FEATURE" | "";
+export type TaskPriority = "HIGH" | "LOW" | "URGENT" | "";
 
 //Task shown in board
 export type Task = {
-    id: string
-    title: string
-    status: string // which column it belongs to
-    type: string // task type bug | story | epic etc
-    storyPoints?: string
-    sortOrder?: number
-    estimateDays?: number
-    estimateMins?: number
-}
-
+  id: string;
+  title: string;
+  assignee: Nullable<Person>;
+  description: string;
+  status: string; // which column it belongs to
+  taskType: TaskType;
+  priority: TaskPriority;
+  storyPoints?: string;
+  sortIndex: number;
+  estimateDays?: number;
+  estimateMinutes?: number;
+};
 
 export type Board = {
-    name: string
-    description: string
-    columns: Column[]
-}
+  id: number;
+  name: string;
+  description: string;
+  projectId: UUID;
+  columns: Column[];
+  tasks: Task[];
+};

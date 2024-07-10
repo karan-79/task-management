@@ -1,15 +1,15 @@
-import Navbar from "@/features/Home/Navbar.tsx";
-import {Outlet} from "react-router-dom";
+import Navbar from "@/features/Home/Navbar";
+import { Outlet } from "react-router-dom";
 
 const Layout = () => {
-    return <>
-        <header>
-            <Navbar/>
-        </header>
-        <main>
-            <Outlet/>
-        </main>
-    </>
-}
+  return (
+    <div className="flex flex-col h-screen">
+      <Navbar />
+      <main className="flex-grow overflow-hidden">
+        <Outlet />
+      </main>
+    </div>
+  );
+};
 
-export default Layout
+export default Layout;

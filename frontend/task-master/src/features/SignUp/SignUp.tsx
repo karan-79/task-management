@@ -1,11 +1,5 @@
-import { Label } from "@/components/Label";
-import { Button } from "@/components/Button";
-import { Input } from "@/components/Input";
 import Typography from "@/components/Typography";
 import { Link } from "react-router-dom";
-import coverImage from "@/assets/pexels-adrien-olichon-1257089-2387793.jpg";
-import { CreateAccountRequest } from "@/service/types.ts";
-import { ChangeEvent, useState } from "react";
 import SignUpCover from "@/features/SignUp/SignUpCover.tsx";
 import SignUpForm from "@/features/SignUp/SignUpForm.tsx";
 

@@ -1,0 +1,170 @@
+[
+  {
+    "username": "john_doe",
+    "password": "Tr8$1m@Lp",
+    "name": "John Doe",
+    "email": "john.doe@example.com"
+  },
+  {
+    "username": "jane_smith",
+    "password": "Qw9$7n!Kx",
+    "name": "Jane Smith",
+    "email": "jane.smith@example.com"
+  },
+  {
+    "username": "mike_johnson",
+    "password": "Pl2#6m$Rt",
+    "name": "Mike Johnson",
+    "email": "mike.johnson@example.com"
+  },
+  {
+    "username": "sarah_williams",
+    "password": "Nv5!8h@Jb",
+    "name": "Sarah Williams",
+    "email": "sarah.williams@example.com"
+  },
+  {
+    "username": "david_brown",
+    "password": "Gy7$2k#Fq",
+    "name": "David Brown",
+    "email": "david.brown@example.com"
+  },
+  {
+    "username": "emily_davis",
+    "password": "Uj1!4d@Hs",
+    "name": "Emily Davis",
+    "email": "emily.davis@example.com"
+  },
+  {
+    "username": "michael_wilson",
+    "password": "Zt6#9c!Lp",
+    "name": "Michael Wilson",
+    "email": "michael.wilson@example.com"
+  },
+  {
+    "username": "olivia_taylor",
+    "password": "Ik8$3f#Wx",
+    "name": "Olivia Taylor",
+    "email": "olivia.taylor@example.com"
+  },
+  {
+    "username": "james_anderson",
+    "password": "Ea2!7m$Rt",
+    "name": "James Anderson",
+    "email": "james.anderson@example.com"
+  },
+  {
+    "username": "sophia_thomas",
+    "password": "Cv9#5k!Nb",
+    "name": "Sophia Thomas",
+    "email": "sophia.thomas@example.com"
+  },
+  {
+    "username": "william_moore",
+    "password": "Px4!9h#Jm",
+    "name": "William Moore",
+    "email": "william.moore@example.com"
+  },
+  {
+    "username": "ava_jackson",
+    "password": "Lq7$2d!Fk",
+    "name": "Ava Jackson",
+    "email": "ava.jackson@example.com"
+  },
+  {
+    "username": "benjamin_white",
+    "password": "Rg1#6c@Nt",
+    "name": "Benjamin White",
+    "email": "benjamin.white@example.com"
+  },
+  {
+    "username": "mia_harris",
+    "password": "Yw5!8m$Pj",
+    "name": "Mia Harris",
+    "email": "mia.harris@example.com"
+  },
+  {
+    "username": "alexander_martin",
+    "password": "Bv2!7k#Qs",
+    "name": "Alexander Martin",
+    "email": "alexander.martin@example.com"
+  },
+  {
+    "username": "charlotte_thompson",
+    "password": "Hn9$4f!Lz",
+    "name": "Charlotte Thompson",
+    "email": "charlotte.thompson@example.com"
+  },
+  {
+    "username": "henry_garcia",
+    "password": "Dt6#1c@Rx",
+    "name": "Henry Garcia",
+    "email": "henry.garcia@example.com"
+  },
+  {
+    "username": "amelia_martinez",
+    "password": "Kp8!3m$Wj",
+    "name": "Amelia Martinez",
+    "email": "amelia.martinez@example.com"
+  },
+  {
+    "username": "daniel_robinson",
+    "password": "Fz2!9h#Nb",
+    "name": "Daniel Robinson",
+    "email": "daniel.robinson@example.com"
+  },
+  {
+    "username": "harper_clark",
+    "password": "Tj5$7d!Gm",
+    "name": "Harper Clark",
+    "email": "harper.clark@example.com"
+  },
+  {
+    "username": "michael_rodriguez",
+    "password": "Qr1#4c@Lk",
+    "name": "Michael Rodriguez",
+    "email": "michael.rodriguez@example.com"
+  },
+  {
+    "username": "evelyn_lewis",
+    "password": "Xs7!2m$Pt",
+    "name": "Evelyn Lewis",
+    "email": "evelyn.lewis@example.com"
+  },
+  {
+    "username": "matthew_lee",
+    "password": "Jn9$6f!Bw",
+    "name": "Matthew Lee",
+    "email": "matthew.lee@example.com"
+  },
+  {
+    "username": "abigail_walker",
+    "password": "Cv3!8h#Dm",
+    "name": "Abigail Walker",
+    "email": "abigail.walker@example.com"
+  },
+  {
+    "username": "joseph_hall",
+    "password": "Lq5$2d!Fx",
+    "name": "Joseph Hall",
+    "email": "joseph.hall@example.com"
+  },
+  {
+    "username": "emily_allen",
+    "password": "Rg7#9c@Nt",
+    "name": "Emily Allen",
+    "email": "emily.allen@example.com"
+  },
+  {
+    "username": "jacob_young",
+    "password": "Yw1!4m$Pj",
+    "name": "Jacob Young",
+    "email": "jacob.young@example.com"
+  },
+  {
+    "username": "sofia_hernandez",
+    "password": "Bv8!6k#Qs",
+    "name": "Sofia Hernandez",
+    "email": "sofia.hernandez@example.com"
+  }
+]

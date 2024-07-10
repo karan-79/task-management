@@ -5,11 +5,11 @@ import com.taskmaster.domain.model.Account;
 import com.taskmaster.domain.model.Role;
 import com.taskmaster.domain.model.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Repository
 @RequiredArgsConstructor
@@ -37,8 +37,7 @@ public class UsersDAO {
     public Account getAccountByUsername(String username) {
         var sql = "SELECT USERNAME, GUID, PASSWORD FROM USERS WHERE USERNAME = :username";
 
-        return jdbcTemplate.query(sql, Map.of("username", username), (rs) -> {
-            if(!rs.next()) return null;
+        return jdbcTemplate.queryForObject(sql, Map.of("username", username), (rs, i) -> {
             return new Account((UUID) rs.getObject("guid"), rs.getString("username"), rs.getString("password"));
         });
 
@@ -46,17 +45,45 @@ public class UsersDAO {
 
     public User getUserById(UUID userId) {
         var sql = "SELECT Username, Name, Role from USERS where guid = :guid";
-        return jdbcTemplate.query(sql, Map.of("guid", userId), rs -> {
-            if(!rs.next()) return null;
+        return jdbcTemplate.queryForObject(sql, Map.of("guid", userId), (rs, i) -> {
             return new User(null,
                     userId,
                     rs.getString("Username"),
                     null,
+                    rs.getString("NAME"),
                     null,
-                    rs.getString("Name"),
                     Role.valueOf(rs.getString("Role")),
                     null);
 
         });
+    }
+
+    public List<User> getUsers(Set<UUID> userIds) {
+        var sql = """
+                 SELECT GUID, NAME, EMAIL FROM USERS WHERE GUID IN (:userIds)
+                """;
+        return jdbcTemplate.query(sql, Map.of("userIds", userIds), getUserRowMapper());
+    }
+
+    private RowMapper<User> getUserRowMapper() {
+        return (rs, num) -> {
+            return new User(
+                    null,
+                    (UUID) rs.getObject("GUID"),
+                    null,
+                    null,
+                    rs.getString("NAME"),
+                    null,
+                    null,
+                    null
+            );
+        };
+    }
+
+    public List<User> findUser(String searchQuery) {
+        var sql = """
+                SELECT * FROM USERS WHERE NAME ILIKE :name
+                """;
+        return jdbcTemplate.query(sql, Map.of("name", "%" + searchQuery + "%"), getUserRowMapper());
     }
 }

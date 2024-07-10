@@ -5,4 +5,4 @@ import jakarta.validation.constraints.NotEmpty;
 public record APICreateProjectRequest(@NotEmpty String name,
                                       String description,
                                       @NotEmpty String shortName,
-                                      String type) {}
+                                      @NotEmpty String type) {}

@@ -1,12 +1,11 @@
 import { RHFormField } from "@/components/Input";
 import { UseControllerProps, useForm } from "react-hook-form";
 import { CreateAccountRequest, LoginRequest } from "@/service/types.ts";
-import { authenticate, getUserData } from "@/service/userService.ts";
+import { authenticate } from "@/service/userService.ts";
 import { useLoggedInUser, User } from "@/store/userStore.ts";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/Button";
 import Typography from "@/components/Typography";
-import { Simulate } from "react-dom/test-utils";
 import {
   FetchMachineState,
   isFailed,
@@ -14,6 +13,7 @@ import {
 } from "@/types/fetchMachine.ts";
 import { Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Identity } from "@/utils.ts";
 
 const LoginForm = () => {
   const { handleSubmit, control, formState } = useForm<LoginRequest>({
@@ -27,7 +27,7 @@ const LoginForm = () => {
     __tag: "IDLE",
   });
 
-  const { token, setToken, setUser } = useLoggedInUser((s) => s);
+  const { token, setToken, setUser } = useLoggedInUser(Identity);
   const navigate = useNavigate();
 
   const onValidForm = (data: LoginRequest) => {

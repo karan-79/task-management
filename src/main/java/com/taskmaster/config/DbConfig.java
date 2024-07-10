@@ -37,9 +37,11 @@ public class DbConfig {
     private void migratePostgres(DataSource ds) {
         var fw = Flyway.configure()
                 .dataSource(ds)
+//                .cleanDisabled(false)
                 .locations("db/migrations/postgres")
                 .load();
 
+//        fw.clean();
         fw.migrate();
 
     }

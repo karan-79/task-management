@@ -1,27 +1,25 @@
-import { lazy, Suspense, useEffect } from "react";
+import { lazy, useEffect } from "react";
 import {
-  BrowserRouter,
   Navigate as Redirect,
-  Routes,
   Route,
+  Routes,
+  useLocation,
   useNavigate,
 } from "react-router-dom";
 import { useLoggedInUser } from "@/store/userStore.ts";
-import { verifyLogin } from "@/service/userService.ts";
-import { LoggedIn } from "@/service/types.ts";
-import { WithLoggedInUser } from "@/Router/withLoggedInUser.tsx";
 
 const Navigate = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    navigate("/home/your-work");
+    console.log("any route");
+    navigate("/home");
   }, []);
 
   return null;
 };
 
-const YourWork = lazy(() => import("../features/Home"));
+const YourWork = lazy(() => import("../features/Home/ProjectOverview.tsx"));
 const Layout = lazy(() => import("../features/Layout"));
 const ProjectOverview = lazy(() => import("../features/Project"));
 const SignUp = lazy(() => import("../features/SignUp"));
@@ -39,6 +37,8 @@ const childRoutes = [
 // TODO redo the redirect using HOC encapsulating each route
 const Router = () => {
   const user = useLoggedInUser((state) => state.user);
+  const { pathname } = useLocation();
+  console.log("user", user);
   return (
     <>
       <Routes>
@@ -52,7 +52,9 @@ const Router = () => {
           })}
         </Route>
       </Routes>
-      {user === null && <Redirect to="/login" />}
+      {user === null && !pathname.includes("/signup") && (
+        <Redirect to="/login" />
+      )}
     </>
   );
 };

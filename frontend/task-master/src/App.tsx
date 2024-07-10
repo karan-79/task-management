@@ -5,11 +5,14 @@ import { Suspense, useEffect, useLayoutEffect } from "react";
 import { http } from "@/config/axiosConfig.ts";
 import { getUserData, refreshToken } from "@/service/userService.ts";
 import { Identity } from "@/utils.ts";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
+import "./index.css";
 
 function App() {
   const { user, token, setUser } = useLoggedInUser(Identity);
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  console.log("user in store", user);
 
   useLayoutEffect(() => {
     const jwt = localStorage.getItem("jwt");
@@ -21,8 +24,8 @@ function App() {
 
       getUserData()
         .then((data) => {
+          console.log("recieved data", data);
           setUser(data);
-          navigate("/home");
         })
         .catch(() => setUser(null));
 
@@ -56,10 +59,15 @@ function App() {
           console.log("set token null 401 all");
           setUser(null);
         }
-      },
+      }
     );
   }, []);
 
+  useEffect(() => {
+    if (user === null) return;
+    if (["/signup", "/login"].includes(pathname)) return navigate("/home");
+    navigate(pathname || "/home");
+  }, [user]);
   return (
     <ThemeProvider defaultTheme="dark">
       <Suspense fallback={<>Loading..</>}>

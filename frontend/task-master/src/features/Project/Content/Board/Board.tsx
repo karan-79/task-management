@@ -1,6 +1,6 @@
 import Typography from "@/components/Typography";
-import { Board as TBoard } from "@/features/Project/types.ts";
-import { FC, useMemo, useState } from "react";
+import { Board as TBoard, Column, Task } from "@/features/Project/types.ts";
+import { FC, useEffect, useMemo, useRef, useState } from "react";
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 import { mockTasks } from "@/service/data.ts";
 import {
@@ -11,20 +11,86 @@ import {
   CardTitle,
 } from "@/components/Card";
 import { Avatar, AvatarFallback } from "@/components/Avatar/Avatar.tsx";
-import TaskLane from "@/features/Project/Content/Board/TaskLane.tsx";
+import TaskLane from "@/features/Project/Content/Board/TaskComponents/TaskLane.tsx";
+import { Button } from "@/components/Button";
+import { Plus } from "lucide-react";
+import CreateColumn from "@/features/Project/Content/Board/CreateColumn.tsx";
+import {
+  createColumn,
+  deleteColumn,
+  updateColumns,
+} from "@/service/boardService.ts";
+import { ScrollArea, ScrollBar } from "@/components/ScrollArea";
+import { Nullable, UUID } from "@/types/generalTypes.ts";
+import TaskForm from "@/features/Project/Content/TaskForm";
+import { CreateTaskSheetState, isTaskSheetOpen } from "./types";
+import {
+  getDeletedColumnState,
+  groupTasksByStatus,
+  reorderColumns,
+  reorderTasksInSameLane,
+  toUpdatedSortIndexRequest,
+} from "./utils";
+import { patchSortIndex, patchStatus } from "@/service/taskService";
 
 type Props = {
   board: TBoard;
+  projectId: UUID;
 };
-const Board: FC<Props> = ({ board }) => {
-  const totalLanes = board.columns.length;
-  const [boardColumns, setBoardColumns] = useState(board.columns);
+const Board: FC<Props> = ({ board, projectId }) => {
+  const [boardColumns, setBoardColumns] = useState<Column[]>(board.columns);
+  const [createCol, setCreateCol] = useState(false);
 
   const columns = useMemo(() => {
     return boardColumns.sort((a, b) => (a.sortIndex > b.sortIndex ? 1 : -1));
   }, [boardColumns]);
 
-  const [tasks, setTasks] = useState(mockTasks);
+  const [createTaskSheet, setCreateTaskSheet] = useState<CreateTaskSheetState>({
+    __tag: "CLOSE",
+  });
+
+  const [tasks, setTasks] = useState<Record<string, Task[]>>(
+    groupTasksByStatus(board.tasks),
+  );
+
+  const handleCreateColumn = (name?: string) => {
+    if (!name || name === "") return setCreateCol(false);
+    createColumn(board.id, { name, sortIndex: boardColumns.length + 1 })
+      .then((col: Column) => {
+        setBoardColumns((prevState) => [...prevState, col]);
+      })
+      .finally(() => setCreateCol(false));
+  };
+
+  const handleDeleteColumn = (id: number) => {
+    deleteColumn(board.id, id)
+      .then(() => {
+        const newCols = getDeletedColumnState(Array.from(columns), id);
+        updateColumns(board.id, newCols).then(() => setBoardColumns(newCols));
+      })
+      .catch((e) => e);
+  };
+
+  const handleCloseTaskForm = (task?: Task, isUpdate?: boolean) => {
+    if (!task) return setCreateTaskSheet({ __tag: "CLOSE" });
+
+    if (isUpdate) {
+      setTasks((prev: any) => ({
+        ...prev,
+        [task.status]: [
+          ...(prev[task.status] as Task[]).filter((t) => t.id != task.id),
+          task,
+        ],
+      }));
+    } else {
+      setTasks((prev: any) => ({
+        ...prev,
+        [task.status]: [...(prev[task.status] || []), task],
+      }));
+    }
+
+    setCreateTaskSheet({ __tag: "CLOSE" });
+  };
 
   //TODO need to think how to persist the order of tasks
   const handleDragEnd = ({ destination, source, draggableId, type }) => {
@@ -36,70 +102,156 @@ const Board: FC<Props> = ({ board }) => {
       return;
 
     if (type === "column") {
-      setBoardColumns((prev) => {
-        const c = prev.find((col) => col.name === draggableId);
-        if (!c) return;
-        c.sortIndex = destination.index;
-        return prev;
-      });
+      const newColumns = reorderColumns(
+        source.index,
+        destination.index,
+        Array.from(columns),
+      );
+
+      updateColumns(board.id, newColumns).then(() =>
+        setBoardColumns(newColumns),
+      );
       return;
+    }
+    const newIndex = destination.index;
+    const sourceColumnId = source.droppableId;
+    const destinationColumnId = destination.droppableId;
+    if (destination.droppableId === source.droppableId) {
+      const updatedTasksWithSortIndex = reorderTasksInSameLane(
+        source.index,
+        destination.index,
+        Array.from(tasks[destinationColumnId]),
+      );
+
+      return patchSortIndex(
+        updatedTasksWithSortIndex.map(toUpdatedSortIndexRequest),
+      ).then(() =>
+        setTasks((prev) => ({
+          ...prev,
+          [destinationColumnId]: updatedTasksWithSortIndex,
+        })),
+      );
     }
 
-    const newIndex = destination.index;
-    if (destination.droppableId === source.droppableId) {
-      //means sort order of tasks changed
-      setTasks((prev) => {
-        const task = prev.find((t) => t.id === draggableId);
-        if (!task) return prev;
-        console.log(task, newIndex);
-        task.sortOrder = newIndex; // i think we may need to think about this
-        return prev;
-      });
-      return;
-    }
     // lane is changed
-    const drop = destination.droppableId; // is column name equal to task status
-    setTasks((prev) => {
-      const task = prev.find((t) => t.id === draggableId);
-      if (!task) return prev;
-      console.log(task, newIndex);
-      task.sortOrder = newIndex; // i think we may need to think about this
-      task.status = drop;
-      return prev;
+    const sourceTasks = Array.from(tasks[sourceColumnId]);
+    const destinationTasks = Array.from(tasks[destinationColumnId] ?? []);
+
+    const [movedTask] = sourceTasks.splice(source.index, 1);
+    movedTask.status = destinationColumnId;
+    destinationTasks.splice(destination.index, 0, movedTask);
+
+    const updatedSourceTasks = sourceTasks.map((task, index) => ({
+      ...task,
+      sortIndex: index,
+    }));
+
+    const updatedDestinationTasks = destinationTasks.map((task, index) => ({
+      ...task,
+      sortIndex: index,
+    }));
+
+    patchStatus(movedTask.status, movedTask.id).then(() => {
+      Promise.all([
+        patchSortIndex(updatedSourceTasks.map(toUpdatedSortIndexRequest)),
+        patchSortIndex(updatedDestinationTasks.map(toUpdatedSortIndexRequest)),
+      ]).then(() =>
+        setTasks((prev) => ({
+          ...prev,
+          [sourceColumnId]: updatedSourceTasks,
+          [destinationColumnId]: updatedDestinationTasks,
+        })),
+      );
     });
   };
 
   return (
-    <div className="flex-1 p-6">
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <Typography variant="h2">{board.name}</Typography>
-          <Typography variant="p">{board.description}</Typography>
+    <>
+      <div className="h-full flex flex-col">
+        <div className="flex-shrink-0 mb-4">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <Typography variant="h2">{board.name}</Typography>
+              <Typography variant="p">{board.description}</Typography>
+            </div>
+            <div className="flex space-x-2">
+              {/*    TODO other buttons on head sections*/}
+            </div>
+          </div>
         </div>
-        <div className="flex space-x-2">
-          {/*    TODO other buttons on head sections*/}
+        <div className="flex-grow overflow-hidden border rounded-md">
+          <ScrollArea className=" h-full">
+            <div className="flex gap-4 p-1 h-full">
+              <DragDropContext onDragEnd={handleDragEnd}>
+                <Droppable
+                  droppableId="board"
+                  direction="horizontal"
+                  type="column"
+                >
+                  {(provided) => {
+                    return (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.droppableProps}
+                        className="flex gap-4 h-full p-1"
+                      >
+                        {columns.map((c, i) => (
+                          <TaskLane
+                            column={c}
+                            key={c.name}
+                            index={i}
+                            tasks={tasks[c.name] ?? []}
+                            onUpdate={(id: string) =>
+                              setCreateTaskSheet({
+                                __tag: "OPEN",
+                                state: "UPDATE",
+                                id,
+                              })
+                            }
+                            onDeleteColumn={handleDeleteColumn}
+                            onCreateTask={() =>
+                              setCreateTaskSheet({
+                                __tag: "OPEN",
+                                status: c.name,
+                                state: "CREATE",
+                              })
+                            }
+                          />
+                        ))}
+                        {provided.placeholder}
+                        {createCol && (
+                          <CreateColumn onClose={handleCreateColumn} />
+                        )}
+                        {!createCol && (
+                          <Button
+                            variant="secondary"
+                            size="icon"
+                            onClick={() => setCreateCol(true)}
+                          >
+                            <Plus />
+                          </Button>
+                        )}
+                      </div>
+                    );
+                  }}
+                </Droppable>
+              </DragDropContext>
+            </div>
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
         </div>
       </div>
-
-      <DragDropContext onDragEnd={handleDragEnd}>
-        <Droppable droppableId="board" type="column">
-          {(provided) => {
-            return (
-              <div
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-                className={`flex min-w-full gap-4 min-h-60`}
-              >
-                {columns.map((c, i) => (
-                  <TaskLane key={c.name} column={c} index={i} tasks={tasks} />
-                ))}
-                {provided.placeholder}
-              </div>
-            );
-          }}
-        </Droppable>
-      </DragDropContext>
-    </div>
+      {isTaskSheetOpen(createTaskSheet) && (
+        <TaskForm
+          open={true}
+          onClose={handleCloseTaskForm}
+          projectId={projectId}
+          sheetState={createTaskSheet}
+          boardId={board.id}
+          status={createTaskSheet.status}
+        />
+      )}
+    </>
   );
 };
 

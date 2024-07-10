@@ -17,7 +17,7 @@ const TextField: FC<Props> = ({ label, error, helperText, ...props }) => {
       </Label>
       <Input {...props} />
       {error && helperText && (
-        <Typography variant={p} className="text-destructive">
+        <Typography variant="h6" className="text-destructive">
           {helperText}
         </Typography>
       )}
