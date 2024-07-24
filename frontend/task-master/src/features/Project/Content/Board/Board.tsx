@@ -1,16 +1,7 @@
 import Typography from "@/components/Typography";
 import { Board as TBoard, Column, Task } from "@/features/Project/types.ts";
-import { FC, useEffect, useMemo, useRef, useState } from "react";
-import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
-import { mockTasks } from "@/service/data.ts";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/Card";
-import { Avatar, AvatarFallback } from "@/components/Avatar/Avatar.tsx";
+import { FC, useMemo, useState } from "react";
+import { DragDropContext, Droppable } from "@hello-pangea/dnd";
 import TaskLane from "@/features/Project/Content/Board/TaskComponents/TaskLane.tsx";
 import { Button } from "@/components/Button";
 import { Plus } from "lucide-react";
@@ -21,9 +12,12 @@ import {
   updateColumns,
 } from "@/service/boardService.ts";
 import { ScrollArea, ScrollBar } from "@/components/ScrollArea";
-import { Nullable, UUID } from "@/types/generalTypes.ts";
-import TaskForm from "@/features/Project/Content/TaskForm";
-import { CreateTaskSheetState, isTaskSheetOpen } from "./types";
+import { UUID } from "@/types/generalTypes.ts";
+import {
+  isTaskSheetOpenForCreate,
+  isTaskSheetOpenForView,
+  TaskSheetState,
+} from "./types";
 import {
   getDeletedColumnState,
   groupTasksByStatus,
@@ -32,6 +26,9 @@ import {
   toUpdatedSortIndexRequest,
 } from "./utils";
 import { patchSortIndex, patchStatus } from "@/service/taskService";
+import TaskFormProvider from "@/features/Project/Content/TaskForm/TaskFormProvider";
+import CreateTaskSheet from "@/features/Project/Content/TaskForm/CreateTaskSheet.tsx";
+import UpdateTaskSheet from "@/features/Project/Content/TaskForm/UpdateTaskSheet.tsx";
 
 type Props = {
   board: TBoard;
@@ -45,7 +42,7 @@ const Board: FC<Props> = ({ board, projectId }) => {
     return boardColumns.sort((a, b) => (a.sortIndex > b.sortIndex ? 1 : -1));
   }, [boardColumns]);
 
-  const [createTaskSheet, setCreateTaskSheet] = useState<CreateTaskSheetState>({
+  const [createTaskSheet, setCreateTaskSheet] = useState<TaskSheetState>({
     __tag: "CLOSE",
   });
 
@@ -241,15 +238,26 @@ const Board: FC<Props> = ({ board, projectId }) => {
           </ScrollArea>
         </div>
       </div>
-      {isTaskSheetOpen(createTaskSheet) && (
-        <TaskForm
-          open={true}
-          onClose={handleCloseTaskForm}
-          projectId={projectId}
-          sheetState={createTaskSheet}
-          boardId={board.id}
-          status={createTaskSheet.status}
-        />
+      {isTaskSheetOpenForCreate(createTaskSheet) && (
+        <TaskFormProvider>
+          <CreateTaskSheet
+            open={true}
+            onClose={handleCloseTaskForm}
+            boardId={board.id}
+            status={createTaskSheet.status}
+          />
+        </TaskFormProvider>
+      )}
+
+      {isTaskSheetOpenForView(createTaskSheet) && (
+        <TaskFormProvider>
+          <UpdateTaskSheet
+            open={true}
+            taskId={createTaskSheet.id}
+            onClose={handleCloseTaskForm}
+            boardId={board.id}
+          />
+        </TaskFormProvider>
       )}
     </>
   );

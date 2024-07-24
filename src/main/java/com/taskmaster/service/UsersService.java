@@ -39,7 +39,13 @@ public class UsersService {
     public APIUser getUser(UUID userId) {
         var user = usersDAO.getUserById(userId);
         if(user == null) return null;
-        return new APIUser(user.guid(), user.name(), user.username(), user.role());
+        return new APIUser(user.guid(), user.name(), user.username(), user.email(), user.role());
+    }
+
+    public Person getPerson(UUID userId) {
+        var user = usersDAO.getUserById(userId);
+        if(user == null) return null;
+        return new Person(user.guid(), user.name(), user.email(), null);
     }
 
     public List<Person> getPersons(Set<UUID> userIds) {
@@ -48,8 +54,16 @@ public class UsersService {
     }
 
 
-    //TODO maybe change this to List<Person> ???
     public List<APIUser> searchUser(String searchQuery) {
-        return usersDAO.findUser(searchQuery).stream().filter(Objects::nonNull).map(user -> new APIUser(user.guid(), user.name(), user.username(), user.role())).toList();
+        return usersDAO.findUser(searchQuery)
+                .stream()
+                .filter(Objects::nonNull)
+                .map(user -> new APIUser(
+                        user.guid(),
+                        user.name(),
+                        user.username(),
+                        user.email(),
+                        user.role()))
+                .toList();
     }
 }

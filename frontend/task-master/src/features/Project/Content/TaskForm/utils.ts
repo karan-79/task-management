@@ -61,25 +61,28 @@ export function validateTaskForm(task: TaskForm): TaskFormErrors[] {
 }
 
 export const groupErrorsByKeys = (errors: TaskFormErrors[]) => {
-  return errors.reduce((a, c) => {
-    if (a[c.field]) {
-      (a[c.field] as TaskFormErrors[]).push(c);
+  return errors.reduce(
+    (a, c) => {
+      if (a[c.field]) {
+        (a[c.field] as TaskFormErrors[]).push(c);
+        return a;
+      }
+      a[c.field] = [c];
       return a;
-    }
-    a[c.field] = [c];
-    return a;
-  }, {} as Record<keyof TaskForm, TaskFormErrors[]>);
+    },
+    {} as Record<keyof TaskForm, TaskFormErrors[]>,
+  );
 };
 
-export const initialState = (status: string): TaskForm => ({
+export const initialState: TaskForm = {
   title: "",
   priority: "",
   description: "",
   taskType: "",
-  status,
+  status: "",
   assignee: null,
   storyPoints: "",
   estimateDays: undefined,
   estimateMinutes: undefined,
   sortIndex: 0,
-});
+};

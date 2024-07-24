@@ -12,10 +12,15 @@ import ProjectType from "@/features/Home/CreateProject/Fields/ProjectType.tsx";
 
 type Props = {
   initialValues: ProjectRequest;
+  isOpenForUpdate?: boolean;
   onSubmit: (data: ProjectRequest) => void;
 };
 
-const ProjectForm: FC<Props> = ({ onSubmit, initialValues }) => {
+const ProjectForm: FC<Props> = ({
+  onSubmit,
+  isOpenForUpdate,
+  initialValues,
+}) => {
   const { control, reset, getValues, watch, setValue, handleSubmit } =
     useForm<ProjectRequest>({
       defaultValues: initialValues,
@@ -31,7 +36,7 @@ const ProjectForm: FC<Props> = ({ onSubmit, initialValues }) => {
       ) {
         setValue(
           "shortName" as any,
-          value.shortName.replace(/\s+/, "").toUpperCase()
+          value.shortName.replace(/\s+/, "").toUpperCase(),
         );
       }
     });
@@ -50,7 +55,7 @@ const ProjectForm: FC<Props> = ({ onSubmit, initialValues }) => {
         <ProjectName control={control} />
         <ProjectDescription control={control} />
         <div className="grid grid-cols-3 gap-2">
-          <ShortName control={control} />
+          <ShortName control={control} disabled={isOpenForUpdate} />
           <ProjectType control={control} />
         </div>
         <SheetFooter>

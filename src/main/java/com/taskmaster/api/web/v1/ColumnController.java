@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -17,7 +18,6 @@ import java.util.UUID;
 public class ColumnController {
 
     private final ColumnService columnService;
-
 
     @PostMapping
     public BoardColumn createColumn(@AuthenticationPrincipal AuthPrincipal principal, @PathVariable Integer boardId, @RequestBody APICreateColumnRequest createColumnRequest) {
@@ -33,6 +33,11 @@ public class ColumnController {
     @DeleteMapping("/{columnId}")
     public void deleteColumn(@AuthenticationPrincipal AuthPrincipal principal, @PathVariable Integer boardId, @PathVariable Integer columnId) {
         columnService.deleteColumn(boardId, columnId);
+    }
+
+    @GetMapping
+    public List<BoardColumn> getColumns(@PathVariable Integer boardId) {
+        return columnService.getBoardColumns(boardId);
     }
 
 }

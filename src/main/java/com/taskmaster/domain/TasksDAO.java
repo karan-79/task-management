@@ -297,4 +297,24 @@ public class TasksDAO {
         );
         return jdbcTemplate.query(sql, Map.of("projectIds", projectIds), mapper);
     }
+
+    public List<Task> getTasksInProject(UUID projectId) {
+        var sql = """
+                SELECT ID,
+                       TITLE,
+                       STATUS,
+                       ASSIGNEE,
+                       STORY_POINTS,
+                       TASK_TYPE_ID,
+                       PRIORITY,
+                       ESTIMATE_DAYS,
+                       ESTIMATE_MINUTES
+                FROM TASKS
+                WHERE PROJECT_ID = :projectId
+                """;
+
+        return jdbcTemplate.query(sql, Map.of(
+                "projectId", projectId
+        ), getTasksForBoardRowMapper());
+    }
 }

@@ -15,7 +15,7 @@ import { debounce, isEmpty } from "lodash";
 import { searchUser } from "@/service/userService.ts";
 import { User } from "@/store/userStore.ts";
 import { Avatar, AvatarFallback } from "@/components/Avatar/Avatar.tsx";
-import { getInitials } from "@/features/Project/Content/TasksTable/utils.ts";
+import { getInitials } from "@/features/Project/Content/TasksTable/utils.tsx";
 import { ScrollArea, ScrollBar } from "@/components/ScrollArea";
 import { Person } from "@/features/Project/types.ts";
 import { Nullable } from "@/types/generalTypes.ts";
@@ -45,7 +45,7 @@ const AssigneeSearch: FC<Props> = ({
       //call search
       searchUser(searchQuery).then(setSearchedUsers);
     }, 500),
-    []
+    [],
   );
 
   const handleSelect = (user: Person) => () => {

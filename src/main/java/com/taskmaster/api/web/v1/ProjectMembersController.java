@@ -22,6 +22,7 @@ public class ProjectMembersController {
         return projectMembersService.getProjectMembers(projectId);
     }
 
+    //TODO need an id only Req body
     @PostMapping
     public ResponseEntity<Void> addMember(@PathVariable UUID projectId, @RequestBody Person person) {
         projectMembersService.addMember(projectId, person.id());

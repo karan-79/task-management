@@ -7,24 +7,15 @@ import { Textarea } from "@/components/TextArea";
 import PrioritySelect from "@/features/Project/Content/TaskForm/PrioritySelect.tsx";
 import { Person, Task } from "@/features/Project/types.ts";
 import { FC, useEffect, useState } from "react";
-import { Nullable } from "@/types/generalTypes.ts";
+import { Nullable, UUID } from "@/types/generalTypes.ts";
 import { TaskForm } from "@/features/Project/Content/TaskForm/types.ts";
+import { useTaskForm } from "@/features/Project/Content/TaskForm/TaskFormProvider/TaskFormProvider.tsx";
+import BoardSelect from "@/features/Project/Content/TaskForm/BoardSelect.tsx";
 
-type Props = {
-  hasError: (field: keyof TaskForm) => boolean;
-  getHelperText: (field: keyof TaskForm) => string | undefined;
-  handleFieldChange: (field: keyof TaskForm) => (e: any) => void;
-  setForm: (val: any) => void;
-  form: TaskForm;
-};
+const TaskFormInputs = () => {
+  const { form, handleFieldChange, hasError, getHelperText, setForm } =
+    useTaskForm();
 
-const TaskFormInputs: FC<Props> = ({
-  handleFieldChange,
-  hasError,
-  getHelperText,
-  setForm,
-  form,
-}) => {
   const [person, setPerson] = useState<Nullable<Person>>(null);
   const handleOnSelectPerson = (person: Person) => {
     setPerson(person);
@@ -88,6 +79,9 @@ const TaskFormInputs: FC<Props> = ({
               {getHelperText("priority")}
             </Typography>
           )}
+        </div>
+        <div>
+          <BoardSelect />
         </div>
       </div>
       <div className="grid grid-cols-3 gap-4">

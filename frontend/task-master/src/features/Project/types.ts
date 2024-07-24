@@ -22,6 +22,7 @@ export type Column = {
 export type Person = {
   id: UUID;
   name: string;
+  email?: string;
   imageUrl?: string;
 };
 
@@ -51,3 +52,5 @@ export type Board = {
   columns: Column[];
   tasks: Task[];
 };
+
+export type BoardIdentity = Pick<Board, "id" | "name">;

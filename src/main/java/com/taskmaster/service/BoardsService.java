@@ -1,6 +1,7 @@
 package com.taskmaster.service;
 
 import com.taskmaster.api.web.v1.model.APIBoard;
+import com.taskmaster.api.web.v1.model.APIBoardIdentity;
 import com.taskmaster.api.web.v1.model.APICreateBoardRequest;
 import com.taskmaster.domain.BoardsDAO;
 import com.taskmaster.domain.model.BoardColumn;
@@ -40,6 +41,13 @@ public class BoardsService {
         columnService.insertDefaultBoardColumns(boardId);
         //mark recent
         boardsDAO.createRecent(boardId, projectId, userId);
+    }
+
+    public List<APIBoardIdentity> getAllBoardsUnderProject(UUID projectId) {
+        return boardsDAO.selectBoardsOfProject(projectId)
+                .stream()
+                .map(b -> new APIBoardIdentity(b.id(), b.name()))
+                .toList();
     }
 
 }

@@ -1,9 +1,8 @@
 import { UUID } from "@/types/generalTypes.ts";
 import { http } from "@/config/axiosConfig.ts";
-import { Board, Column } from "@/features/Project/types.ts";
+import { Board, BoardIdentity, Column } from "@/features/Project/types.ts";
 import { getData } from "@/utils.ts";
 import { CreateBoardRequest, CreateColumnRequest } from "@/service/types.ts";
-import board from "@/features/Project/Content/Board";
 
 export const getRecentBoard = (projectId: UUID) => {
   return http
@@ -21,9 +20,15 @@ export const createColumn = (boardId: number, column: CreateColumnRequest) => {
     .then(getData);
 };
 
+export const getAllBoardsForProject = (projectId: UUID) => {
+  return http
+    .get<BoardIdentity[]>(`/v1/projects/${projectId}/boards`)
+    .then(getData);
+};
+
 export const updateColumns = (
   boardId: number,
-  columns: CreateColumnRequest[]
+  columns: CreateColumnRequest[],
 ) => {
   return http.put(`/v1/boards/${boardId}/columns`, { columns });
 };

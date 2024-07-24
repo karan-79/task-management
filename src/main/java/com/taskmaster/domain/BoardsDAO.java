@@ -2,6 +2,7 @@ package com.taskmaster.domain;
 
 import com.taskmaster.api.web.v1.model.APICreateBoardRequest;
 import com.taskmaster.domain.mapper.RecentBoardJoinMapper;
+import com.taskmaster.domain.model.Board;
 import com.taskmaster.domain.model.RecentBoardJoin;
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.RowMapper;
@@ -84,6 +85,19 @@ public class BoardsDAO {
 
     public void markRecent(int boardId, UUID projectId, UUID userId) {
 
+    }
+
+    public List<Board> selectBoardsOfProject(UUID projectId) {
+        var sql = """
+                SELECT ID, NAME FROM BOARDS WHERE PROJECT_ID = :projectId
+                """;
+        return jdbcTemplate.query(sql, Map.of("projectId", projectId), (rs, r) -> new Board(
+                rs.getInt("ID"),
+                rs.getString("NAME"),
+                null,
+                null,
+                null
+        ));
     }
 
     public List<Map<UUID, Integer>> selectCountOfBoards(Set<UUID> projectIds) {

@@ -8,6 +8,7 @@ public record APIUser(
         UUID id,
         String name,
         String username,
+        String email,
         Role role
 ) {
 }

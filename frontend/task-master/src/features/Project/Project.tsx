@@ -6,6 +6,7 @@ import { getProjectById } from "@/service/projectService.ts";
 import { Project } from "@/features/Project/types.ts";
 import { PanelSections } from "@/features/Project/types.ts";
 import { UUID } from "@/types/generalTypes.ts";
+import ProjectProvider from "@/features/Project/ProjectProvider";
 
 const Project = () => {
   const { projectId } = useParams<{ projectId: UUID }>();
@@ -22,14 +23,16 @@ const Project = () => {
 
   return (
     <div className="grid grid-cols-12 gap-4 h-full">
-      <SidePanel
-        selectedView={selected}
-        onChangeSelectedView={(selected: PanelSections) =>
-          setSelected(selected)
-        }
-        projectName={project?.name || ""}
-      />
-      <Content view={selected} projectId={project.id} />
+      <ProjectProvider projectId={projectId}>
+        <SidePanel
+          selectedView={selected}
+          onChangeSelectedView={(selected: PanelSections) =>
+            setSelected(selected)
+          }
+          projectName={project?.name || ""}
+        />
+        <Content view={selected} projectId={project.id} />
+      </ProjectProvider>
     </div>
   );
 };

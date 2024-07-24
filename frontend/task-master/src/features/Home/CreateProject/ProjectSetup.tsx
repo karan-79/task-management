@@ -22,7 +22,7 @@ import {
 import { Project } from "@/features/Project/types.ts";
 
 const getInitialState = (
-  sheetState: ProjectSetupSheetState
+  sheetState: ProjectSetupSheetState,
 ): ProjectRequest => {
   return isProjectSetupSheetOpenForUpdate(sheetState)
     ? {
@@ -46,8 +46,6 @@ type Props = {
 };
 
 const ProjectSetup: FC<Props> = ({ sheetState, onClose, onSubmit }) => {
-  const isSetupInEditMode = isProjectSetupSheetOpenForUpdate(sheetState);
-
   const projectForm = useMemo(() => getInitialState(sheetState), []);
 
   const handleCloseSheet = () => {
@@ -61,7 +59,7 @@ const ProjectSetup: FC<Props> = ({ sheetState, onClose, onSubmit }) => {
   const handleUpdate = (project: ProjectRequest) => {
     if (isProjectSetupSheetOpenForUpdate(sheetState)) {
       updateProject(sheetState.project.id, project).then(() =>
-        onSubmit({ ...sheetState.project, ...project })
+        onSubmit({ ...sheetState.project, ...project }),
       );
     }
   };
@@ -69,8 +67,12 @@ const ProjectSetup: FC<Props> = ({ sheetState, onClose, onSubmit }) => {
   return (
     <Sheet open={true} onOpenChange={handleCloseSheet}>
       <SheetContent className="min-w-[600px]">
-        {isSetupInEditMode ? <UpdateSheetHeader /> : <CreateSheetHeader />}
-        {isSetupInEditMode ? (
+        {isProjectSetupSheetOpenForUpdate(sheetState) ? (
+          <UpdateSheetHeader />
+        ) : (
+          <CreateSheetHeader />
+        )}
+        {isProjectSetupSheetOpenForUpdate(sheetState) ? (
           <Tabs defaultValue="details" className="m-2">
             <TabsList className="w-full grid grid-cols-2">
               <TabsTrigger value="details">Details</TabsTrigger>
@@ -81,11 +83,12 @@ const ProjectSetup: FC<Props> = ({ sheetState, onClose, onSubmit }) => {
                 key={projectForm.name}
                 onSubmit={handleUpdate}
                 initialValues={projectForm}
+                isOpenForUpdate={true}
               />
             </TabsContent>
 
             <TabsContent value="access">
-              <AccessManagement />
+              <AccessManagement projectId={sheetState.project.id} />
             </TabsContent>
           </Tabs>
         ) : (

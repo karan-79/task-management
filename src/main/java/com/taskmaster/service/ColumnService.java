@@ -30,6 +30,10 @@ public class ColumnService {
         columnDAO.insertDefaultBoardColumns(boardId);
     }
 
+    public List<BoardColumn> getBoardColumns(int boardId) {
+        return columnDAO.getAllColumns(boardId);
+    }
+
     public void deleteColumn(Integer boardId, Integer columnId) {
         columnDAO.deleteColumn(boardId, columnId);
     }

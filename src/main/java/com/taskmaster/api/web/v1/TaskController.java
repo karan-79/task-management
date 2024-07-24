@@ -39,6 +39,7 @@ public class TaskController {
         return taskService.getTaskById(id);
     }
 
+    //TODO make it resource identifiable in the maping /{id} not int the payload
     @PutMapping
     public void updateTask(@RequestBody APITask task) {
         taskService.updateTask(task);

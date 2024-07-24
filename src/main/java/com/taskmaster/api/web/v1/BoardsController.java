@@ -1,6 +1,7 @@
 package com.taskmaster.api.web.v1;
 
 import com.taskmaster.api.web.v1.model.APIBoard;
+import com.taskmaster.api.web.v1.model.APIBoardIdentity;
 import com.taskmaster.api.web.v1.model.APICreateBoardRequest;
 import com.taskmaster.api.web.v1.model.APICreateColumnRequest;
 import com.taskmaster.config.AuthPrincipal;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -22,6 +24,11 @@ public class BoardsController {
     @GetMapping("/recent")
     public APIBoard getRecentBoard(@PathVariable UUID projectId, @AuthenticationPrincipal AuthPrincipal principal) {
         return boardsService.getMostRecentBoard(principal.getUserId(), projectId);
+    }
+
+    @GetMapping
+    public List<APIBoardIdentity> getAll(@PathVariable UUID projectId) {
+        return boardsService.getAllBoardsUnderProject(projectId);
     }
 
     @PostMapping

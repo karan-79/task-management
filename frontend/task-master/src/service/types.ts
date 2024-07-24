@@ -1,5 +1,6 @@
 import { TaskForm } from "@/features/Project/Content/TaskForm/types";
-import { UUID } from "@/types/generalTypes";
+import { Nullable, UUID } from "@/types/generalTypes";
+import { Person, TaskPriority, TaskType } from "@/features/Project/types.ts";
 
 export type CreateAccountRequest = {
   name: string;
@@ -44,4 +45,13 @@ export type UpdateTaskSortIndexRequest = {
 
 export type UpdateStatusOfTaskRequest = {
   status: string;
+};
+
+export type APIProjectTasks = {
+  taskId: string;
+  assignee: Nullable<Person>;
+  title: string;
+  type: TaskType;
+  status: string;
+  priority: TaskPriority;
 };

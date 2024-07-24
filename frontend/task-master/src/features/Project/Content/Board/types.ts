@@ -17,11 +17,12 @@ type Close = {
   __tag: "CLOSE";
 };
 
-export type CreateTaskSheetState = Open | OpenForUpdate | Close;
+export type TaskSheetState = Open | OpenForUpdate | Close;
 
-export const isTaskSheetOpen = (state: CreateTaskSheetState): state is Open =>
-  state.__tag === "OPEN";
+export const isTaskSheetOpenForCreate = (
+  state: TaskSheetState,
+): state is Open => state.__tag === "OPEN" && state.state === "CREATE";
 
-export const isTaskSheetOpenForUpdate = (
-  state: CreateTaskSheetState
+export const isTaskSheetOpenForView = (
+  state: TaskSheetState,
 ): state is OpenForUpdate => state.__tag === "OPEN" && state.state === "UPDATE";

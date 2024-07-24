@@ -1,6 +1,5 @@
 package com.taskmaster.domain;
 
-import com.taskmaster.api.web.v1.model.APIUser;
 import com.taskmaster.domain.model.Account;
 import com.taskmaster.domain.model.Role;
 import com.taskmaster.domain.model.User;
@@ -9,7 +8,10 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
-import java.util.*;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
 
 @Repository
 @RequiredArgsConstructor
@@ -44,14 +46,14 @@ public class UsersDAO {
     }
 
     public User getUserById(UUID userId) {
-        var sql = "SELECT Username, Name, Role from USERS where guid = :guid";
+        var sql = "SELECT Username, Name, Email, Role from USERS where guid = :guid";
         return jdbcTemplate.queryForObject(sql, Map.of("guid", userId), (rs, i) -> {
             return new User(null,
                     userId,
                     rs.getString("Username"),
                     null,
                     rs.getString("NAME"),
-                    null,
+                    rs.getString("EMAIL"),
                     Role.valueOf(rs.getString("Role")),
                     null);
 
@@ -73,7 +75,7 @@ public class UsersDAO {
                     null,
                     null,
                     rs.getString("NAME"),
-                    null,
+                    rs.getString("EMAIL"),
                     null,
                     null
             );

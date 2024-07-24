@@ -1,5 +1,5 @@
 import Typography from "@/components/Typography";
-import { getInitials } from "../Project/Content/TasksTable/utils";
+import { getInitials } from "../Project/Content/TasksTable/utils.tsx";
 import { Person } from "../Project/types";
 import { Avatar, AvatarFallback } from "@/components/Avatar/Avatar";
 import { FC } from "react";

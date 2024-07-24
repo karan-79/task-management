@@ -15,7 +15,7 @@ public class ProjectMembersDAO {
 
 
     public List<UUID> getProjectMembers(UUID projectId) {
-        var sql = "SELECT USER_ID FROM PROJECT_MEMBER WHERE PROJECT_ID = :projectId";
+        var sql = "SELECT USER_ID FROM PROJECT_MEMBERS WHERE PROJECT_ID = :projectId";
         return jdbcTemplate.queryForList(sql, Map.of("projectId", projectId), UUID.class);
     }
 

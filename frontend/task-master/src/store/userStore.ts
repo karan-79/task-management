@@ -1,11 +1,11 @@
-import { create, StateCreator } from "zustand";
 import Project from "@/features/Project";
-import { Simulate } from "react-dom/test-utils";
+import { create, StateCreator } from "zustand";
 
 export type User = {
   id: string;
   name: string;
   username: string;
+  email?: string;
   role: "ADMIN" | "USER"; //not sure if this is the correct way
 };
 
@@ -25,7 +25,7 @@ type ProjectsState = {
 
 type Store = {
   loggedInUserSlice: LoggedInUserState;
-  productsSlice: ProjectsState;
+  projectsSlice: ProjectsState;
 };
 
 // TODO maybe move these slices to the respective dirs
@@ -50,37 +50,37 @@ const createLoggedInUserSlice: StateCreator<
 });
 
 const createProjectsSlice: StateCreator<Store, [], [], ProjectsState> = (
-  set
+  set,
 ) => ({
   projects: [],
   addProject: (project: Project) =>
     set((state) => ({
       ...state,
-      productsSlice: {
-        ...state.productsSlice,
-        projects: [...state.productsSlice.projects, project],
+      projectsSlice: {
+        ...state.projectsSlice,
+        projects: [...state.projectsSlice.projects, project],
       },
     })),
   removeProject: (id: string) =>
     set((state) => {
       return {
         ...state,
-        productsSlice: {
-          ...state.productsSlice,
-          projects: state.productsSlice.projects.filter((p) => p.id !== id),
+        projectsSlice: {
+          ...state.projectsSlice,
+          projects: state.projectsSlice.projects.filter((p) => p.id !== id),
         },
       };
     }),
   setProjects: (projects) =>
     set((state) => ({
       ...state,
-      productsSlice: { ...state.productsSlice, projects },
+      projectsSlice: { ...state.projectsSlice, projects },
     })),
 });
 
 export const useStore = create<Store>()((...set) => ({
   loggedInUserSlice: createLoggedInUserSlice(...set),
-  productsSlice: createProjectsSlice(...set),
+  projectsSlice: createProjectsSlice(...set),
 }));
 
 type LoggedInUserStateSelector<T> = (state: LoggedInUserState) => T;
@@ -90,4 +90,4 @@ export const useLoggedInUser = <T>(fn: LoggedInUserStateSelector<T>) =>
 type ProjectsStateSelector<T> = (state: ProjectsState) => T;
 
 export const useProjects = <T>(fn: ProjectsStateSelector<T>) =>
-  useStore((state) => fn(state.productsSlice));
+  useStore((state) => fn(state.projectsSlice));

@@ -7,114 +7,96 @@ import {
   TableRow,
 } from "@/components/Table";
 import { Avatar, AvatarFallback } from "@/components/Avatar/Avatar.tsx";
-import { getInitials } from "@/features/Project/Content/TasksTable/utils.ts";
-import { Task } from "@/features/Project/types.ts";
+import { getInitials } from "@/features/Project/Content/TasksTable/utils.tsx";
+import { FC, useState } from "react";
+import { APIProjectTasks } from "@/service/types.ts";
+import { useFetchWithLoading } from "@/hooks/useFetchWithLoading.ts";
+import { getTasksForProject } from "@/service/projectService.ts";
+import { isNil } from "lodash";
+import { Badge } from "@/components/Badge";
+import PriorityBadge from "@/features/Project/Content/TasksTable/PriorityBadge.tsx";
+import TaskTypeBadge from "@/features/Project/Content/TasksTable/TaskTypeBadge.tsx";
+import {
+  isTaskSheetOpenForView,
+  TaskSheetState,
+} from "@/features/Project/Content/Board/types.ts";
+import UpdateTaskSheet from "@/features/Project/Content/TaskForm/UpdateTaskSheet.tsx";
+import TaskFormProvider from "@/features/Project/Content/TaskForm/TaskFormProvider";
 
-const mockTasks: Task[] = [
-  {
-    id: "PL-1",
-    title: "Implement login functionality",
-    assignee: { id: "1", name: "John Doe", email: "john.doe@example.com" },
-    status: "Todo",
-    type: "story",
-    priority: "LOW",
-    storyPoints: "5",
-    sortIndex: 1,
-    estimateDays: 3,
-    estimateMins: 180,
-  },
-  {
-    id: "PL-2",
-    title: "Fix dashboard layout issues",
-    assignee: { id: "2", name: "Jane Smith", email: "jane.smith@example.com" },
-    status: "In Progress",
-    type: "bug",
-    priority: "HIGH",
-    sortIndex: 2,
-    estimateDays: 1,
-    estimateMins: 60,
-  },
-  {
-    id: "PL-3",
-    title: "Implement search functionality",
-    assignee: {
-      id: "3",
-      name: "Mike Johnson",
-      email: "mike.johnson@example.com",
-    },
-    status: "Todo",
-    priority: "URGENT",
-    type: "story",
-    storyPoints: "8",
-    sortIndex: 3,
-    estimateDays: 5,
-    estimateMins: 300,
-  },
-  {
-    id: "PL-4",
-    title: "Redesign user profile page",
-    assignee: {
-      id: "4",
-      name: "Sarah Wilson",
-      email: "sarah.wilson@example.com",
-    },
-    status: "Done",
-    type: "epic",
-    priority: "HIGH",
-    storyPoints: "13",
-    sortIndex: 4,
-    estimateDays: 10,
-    estimateMins: 600,
-  },
-  {
-    id: "PL-5",
-    title: "Optimize database queries",
-    assignee: {
-      id: "5",
-      name: "David Brown",
-      email: "david.brown@example.com",
-    },
-    status: "In Progress",
-    type: "bug",
-    priority: "HIGH",
-    sortIndex: 5,
-    estimateDays: 2,
-    estimateMins: 120,
-  },
-];
+type Props = {
+  projectId: string;
+};
+const TaskTable: FC<Props> = ({ projectId }) => {
+  const { isLoading, data: tasks } = useFetchWithLoading<APIProjectTasks[]>({
+    fetchFn: () => getTasksForProject(projectId),
+    initialState: [],
+  });
 
-const TaskTable = () => {
+  const [sheetState, setSheetState] = useState<TaskSheetState>({
+    __tag: "CLOSE",
+  });
+
   return (
-    <Table>
-      <TableHeader>
-        <TableHead>Id</TableHead>
-        <TableHead>Assignee</TableHead>
-        <TableHead>Title</TableHead>
-        <TableHead>Type</TableHead>
-        <TableHead>Priority</TableHead>
-      </TableHeader>
-      <TableBody>
-        {mockTasks.map((task) => {
-          return (
-            <TableRow>
-              <TableCell>{task.id}</TableCell>
-              <TableCell>
-                <div className="flex gap-2 items-center">
-                  <Avatar>
-                    <AvatarFallback>
-                      {getInitials(task.assignee)}
-                    </AvatarFallback>
-                  </Avatar>
-                </div>
-              </TableCell>
-              <TableCell>{task.title}</TableCell>
-              <TableCell>{task.type}</TableCell>
-              <TableCell>{task.priority}</TableCell>
-            </TableRow>
-          );
-        })}
-      </TableBody>
-    </Table>
+    <>
+      <Table>
+        <TableHeader className="bg-accent">
+          <TableHead>Id</TableHead>
+          <TableHead>Assignee</TableHead>
+          <TableHead>Title</TableHead>
+          <TableHead>Status</TableHead>
+          <TableHead>Type</TableHead>
+          <TableHead>Priority</TableHead>
+        </TableHeader>
+        <TableBody>
+          {tasks.map((task) => {
+            return (
+              <TableRow
+                key={task.taskId}
+                onClick={() => {
+                  setSheetState({
+                    __tag: "OPEN",
+                    state: "UPDATE",
+                    id: task.taskId,
+                  });
+                }}
+              >
+                <TableCell>{task.taskId}</TableCell>
+                <TableCell>
+                  <div className="flex gap-2 items-center">
+                    <Avatar>
+                      <AvatarFallback>
+                        {isNil(task.assignee)
+                          ? "N/A"
+                          : getInitials(task.assignee)}
+                      </AvatarFallback>
+                    </Avatar>
+                  </div>
+                </TableCell>
+                <TableCell>{task.title}</TableCell>
+                <TableCell>
+                  <Badge>{task.status}</Badge>
+                </TableCell>
+                <TableCell>
+                  <TaskTypeBadge type={task.type} />
+                </TableCell>
+                <TableCell>
+                  <PriorityBadge priority={task.priority} />
+                </TableCell>
+              </TableRow>
+            );
+          })}
+        </TableBody>
+      </Table>
+      {isTaskSheetOpenForView(sheetState) && (
+        <TaskFormProvider>
+          <UpdateTaskSheet
+            taskId={sheetState.id}
+            open={true}
+            onClose={() => setSheetState({ __tag: "CLOSE" })}
+          />
+        </TaskFormProvider>
+      )}
+    </>
   );
 };
 

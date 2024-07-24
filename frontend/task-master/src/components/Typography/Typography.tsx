@@ -1,4 +1,5 @@
 import { createElement, FC, PropsWithChildren } from "react";
+import { cn } from "@/utils.ts";
 
 type TypographyProps = PropsWithChildren<{
   className?: string;
@@ -89,7 +90,10 @@ function TypographyH6({ children, className = "", ...props }: TypographyProps) {
 function TypographyP({ children, className = "", ...props }: TypographyProps) {
   return (
     <p
-      className={"leading-7 [&:not(:first-child)]:mt-6" + " " + className}
+      className={cn(
+        "leading-7 [&:not(:first-child)]:mt-6 break-words",
+        className,
+      )}
       {...props}
     >
       {children}

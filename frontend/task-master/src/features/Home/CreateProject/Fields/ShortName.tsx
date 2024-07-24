@@ -3,7 +3,11 @@ import { ControlProps } from "@/features/Home/CreateProject/Fields/types.ts";
 import { RHFormFieldV2 } from "@/components/Input";
 import { UseControllerProps } from "react-hook-form";
 
-const ShortName: FC<ControlProps> = ({ control }) => {
+type Props = {
+  disabled?: boolean;
+} & ControlProps;
+
+const ShortName: FC<Props> = ({ control, disabled }) => {
   return (
     <div className="flex-col items-center">
       <RHFormFieldV2
@@ -25,6 +29,7 @@ const ShortName: FC<ControlProps> = ({ control }) => {
         }
         label="Short name"
         placeholder="Add short name.."
+        disabled={disabled}
       />
     </div>
   );

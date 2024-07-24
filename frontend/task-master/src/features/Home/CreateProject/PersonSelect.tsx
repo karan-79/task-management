@@ -1,4 +1,11 @@
-import { ChangeEvent, useCallback, useEffect, useRef, useState } from "react";
+import {
+  ChangeEvent,
+  FC,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { Person } from "@/features/Project/types.ts";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/Popover";
 import { searchUser } from "@/service/userService";
@@ -11,7 +18,11 @@ import { ScrollArea, ScrollBar } from "@/components/ScrollArea";
 import { useElementWidth } from "@/hooks/useElementWidth";
 import PersonSelectableLabel from "@/features/components/PersonSelectableLabel";
 
-const PersonSelect = () => {
+type Props = {
+  onSelect: (person: Person) => void;
+};
+
+const PersonSelect: FC<Props> = ({ onSelect }) => {
   const [open, setOpen] = useState(false);
   const [persons, setPersons] = useState<Person[]>([]);
   const buttonRef = useRef(null);
@@ -21,13 +32,11 @@ const PersonSelect = () => {
     debounce((e: ChangeEvent<HTMLInputElement>) => {
       if (isEmpty(e.target.value.trim())) return;
       searchUser(e.target.value.trim()).then((users) =>
-        setPersons(users satisfies Person[])
+        setPersons(users satisfies Person[]),
       );
     }, 500),
-    []
+    [],
   );
-
-  const handleSelect = (person: Person) => () => {};
 
   return (
     <Popover modal={true} open={open} onOpenChange={setOpen}>
@@ -57,7 +66,7 @@ const PersonSelect = () => {
                 <PersonSelectableLabel
                   key={person.id}
                   person={person}
-                  onSelect={handleSelect(person)}
+                  onSelect={() => onSelect(person)}
                 />
               );
             })}

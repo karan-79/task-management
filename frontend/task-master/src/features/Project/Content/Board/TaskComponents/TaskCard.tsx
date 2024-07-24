@@ -9,7 +9,7 @@ import {
 } from "@/components/Card";
 import { Avatar, AvatarFallback } from "@/components/Avatar/Avatar.tsx";
 import { Draggable } from "@hello-pangea/dnd";
-import { getInitials } from "../../TasksTable/utils.ts";
+import { getInitials } from "../../TasksTable/utils.tsx";
 import TaskContextMenu from "@/features/Project/Content/Board/TaskComponents/TaskContextMenu.tsx";
 import { deleteTask } from "@/service/taskService.ts";
 

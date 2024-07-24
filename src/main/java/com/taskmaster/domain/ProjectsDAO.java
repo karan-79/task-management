@@ -42,7 +42,6 @@ public class ProjectsDAO {
 
     }
 
-    @SneakyThrows
     public List<Project> getAllProjectsForUser(UUID userId) {
         var sql = """
                 SELECT * FROM PROJECTS WHERE OWNER_ID = :owner
@@ -50,6 +49,17 @@ public class ProjectsDAO {
 
          return jdbcTemplate.query(sql, Map.of("owner", userId), projectsMapper);
     }
+
+
+    public List<Project> getAllProjects(List<UUID> projectIds) {
+        var sql = """
+                SELECT * FROM PROJECTS WHERE GUID IN (:projectIds)
+                """;
+
+        return jdbcTemplate.query(sql, Map.of("projectIds", projectIds), projectsMapper);
+    }
+
+
 
     public Project getById(UUID projectId) { //id should of the person having acces to project
 
